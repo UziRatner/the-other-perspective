@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#B88AB8"/>
+      <stop offset="100%" style="stop-color:#9D6B9D"/>
+    </linearGradient>
+    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6B9D9D"/>
+      <stop offset="100%" style="stop-color:#5A8A8A"/>
+    </linearGradient>
+    <clipPath id="circleClip">
+      <circle cx="256" cy="256" r="240"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="#FDF8F6"/>
+
+  <!-- Main yin-yang shape -->
+  <g clip-path="url(#circleClip)">
+    <!-- Purple (left/top) half -->
+    <path d="M256,16 A240,240 0 0,1 256,496 A120,120 0 0,1 256,256 A120,120 0 0,0 256,16" fill="url(#purpleGrad)"/>
+
+    <!-- Teal (right/bottom) half -->
+    <path d="M256,16 A240,240 0 0,0 256,496 A120,120 0 0,0 256,256 A120,120 0 0,1 256,16" fill="url(#tealGrad)"/>
+
+    <!-- Small teal dot in purple section -->
+    <circle cx="256" cy="136" r="36" fill="url(#tealGrad)"/>
+
+    <!-- Small purple dot in teal section -->
+    <circle cx="256" cy="376" r="36" fill="url(#purpleGrad)"/>
+  </g>
+
+  <!-- Subtle border -->
+  <circle cx="256" cy="256" r="240" fill="none" stroke="#E8E0DC" stroke-width="2"/>
+</svg>

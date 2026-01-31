@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-primary: #FDF8F6;
+  --bg-secondary: #FAF5F2;
+  --bg-card: #FFFFFF;
+  --text-primary: #2D2A26;
+  --text-secondary: #6B6560;
+  --accent-primary: #9D6B9D;
+  --accent-secondary: #6B9D9D;
+  --accent-male: #5B8FB9;
+  --accent-female: #B97B8B;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: 'Heebo', 'Rubik', sans-serif;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  text-align: right;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8a5a8a;
+}
+
+/* Animation classes */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.4s ease-out forwards;
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Button hover effects */
+.btn-primary {
+  @apply bg-accent-primary text-white font-medium py-3 px-6 rounded-lg
+         transition-all duration-200 hover:brightness-110 hover:shadow-lg
+         active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* Card styles */
+.card {
+  @apply bg-background-card rounded-xl shadow-sm border border-gray-100 p-6;
+}
+
+/* Toggle button styles */
+.toggle-btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200
+         border-2 border-transparent;
+}
+
+.toggle-btn.active {
+  @apply border-accent-primary bg-accent-primary/10 text-accent-primary;
+}
+
+.toggle-btn:not(.active) {
+  @apply bg-background-secondary text-foreground-secondary hover:bg-background-secondary/80;
+}
