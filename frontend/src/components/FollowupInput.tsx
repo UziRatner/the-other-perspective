@@ -34,16 +34,16 @@ export default function FollowupInput({ onSubmit, isLoading }: FollowupInputProp
           className="flex-1 p-3 rounded-lg border border-gray-200 bg-background-secondary
                      text-foreground-primary placeholder:text-foreground-secondary/60
                      focus:outline-none focus:ring-2 focus:ring-accent-primary/50 focus:border-accent-primary
-                     transition-all duration-200"
+                     transition-all duration-200 text-base min-h-[44px]"
           dir="rtl"
           disabled={isLoading}
         />
         <button
           type="submit"
           disabled={message.trim().length < 2 || isLoading}
-          className="px-4 py-3 rounded-lg font-medium transition-all duration-200
+          className="px-6 py-3 rounded-lg font-medium transition-all duration-200
                      bg-accent-primary text-white hover:brightness-110
-                     disabled:opacity-50 disabled:cursor-not-allowed"
+                     disabled:opacity-50 disabled:cursor-not-allowed min-w-[60px] min-h-[44px]"
         >
           {isLoading ? "..." : "שלח"}
         </button>

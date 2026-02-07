@@ -33,7 +33,7 @@ export default function AnalysisForm({ onSubmit, isLoading }: AnalysisFormProps)
   const isValid = gender && context && situation.trim().length >= 10;
 
   return (
-    <form onSubmit={handleSubmit} className="card space-y-6">
+    <form onSubmit={handleSubmit} className="card space-y-4 md:space-y-6">
       {/* Gender Selection */}
       <div className="space-y-3">
         <label className="block text-foreground-primary font-medium">
@@ -101,10 +101,10 @@ export default function AnalysisForm({ onSubmit, isLoading }: AnalysisFormProps)
           value={situation}
           onChange={(e) => setSituation(e.target.value)}
           placeholder="למשל: הבת זוג שלי אמרה שהיא צריכה 'זמן לעצמה' אחרי שהצעתי שנצא לארוחת ערב..."
-          className="w-full h-32 p-4 rounded-lg border border-gray-200 bg-background-secondary
+          className="w-full h-24 md:h-32 p-4 rounded-lg border border-gray-200 bg-background-secondary
                      text-foreground-primary placeholder:text-foreground-secondary/60
                      focus:outline-none focus:ring-2 focus:ring-accent-primary/50 focus:border-accent-primary
-                     resize-none transition-all duration-200"
+                     resize-none transition-all duration-200 text-base"
           dir="rtl"
         />
         <p className="text-sm text-foreground-secondary">

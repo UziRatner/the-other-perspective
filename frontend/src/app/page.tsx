@@ -6,7 +6,8 @@ import ResultCard from "@/components/ResultCard";
 import FollowupInput from "@/components/FollowupInput";
 import ConversationHistory from "@/components/ConversationHistory";
 import ConversationsList from "@/components/ConversationsList";
-import { getDeviceId } from "@/lib/deviceId";
+import PhoneLogin from "@/components/PhoneLogin";
+import { useAuth } from "@/components/AuthProvider";
 
 interface AnalysisResult {
   perspective: string;
@@ -41,13 +42,7 @@ type Gender = "male" | "female";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function Home() {
-  const [deviceId, setDeviceId] = useState<string>(() => {
-    // Initialize on client side only
-    if (typeof window !== "undefined") {
-      return getDeviceId();
-    }
-    return "";
-  });
+  const { user, isLoading: authLoading, signOut } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [initialResult, setInitialResult] = useState<AnalysisResult | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -55,12 +50,7 @@ export default function Home() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Ensure device ID is set on mount (for SSR hydration)
-  useEffect(() => {
-    if (!deviceId) {
-      setDeviceId(getDeviceId());
-    }
-  }, [deviceId]);
+  const userId = user?.id ?? "";
 
   const handleInitialSubmit = async (data: {
     situation: string;
@@ -71,12 +61,6 @@ export default function Home() {
     setError(null);
 
     try {
-      // Get device ID directly to ensure it's available
-      const currentDeviceId = deviceId || getDeviceId();
-      if (!deviceId && currentDeviceId) {
-        setDeviceId(currentDeviceId);
-      }
-
       const response = await fetch(`${API_URL}/api/analyze`, {
         method: "POST",
         headers: {
@@ -84,7 +68,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           ...data,
-          device_id: currentDeviceId,
+          user_id: userId,
         }),
       });
 
@@ -124,8 +108,6 @@ export default function Home() {
     setMessages(updatedMessages);
 
     try {
-      const currentDeviceId = deviceId || getDeviceId();
-
       const response = await fetch(`${API_URL}/api/analyze`, {
         method: "POST",
         headers: {
@@ -134,7 +116,7 @@ export default function Home() {
         body: JSON.stringify({
           ...conversationContext,
           messages: updatedMessages,
-          device_id: currentDeviceId,
+          user_id: userId,
           conversation_id: conversationId,
         }),
       });
@@ -233,13 +215,40 @@ export default function Home() {
   // Get follow-up messages (after the initial exchange)
   const followupMessages = messages.slice(2);
 
+  if (authLoading) {
+    return (
+      <main className="min-h-[100dvh] flex items-center justify-center">
+        <div className="text-foreground-secondary animate-pulse-slow">טוען...</div>
+      </main>
+    );
+  }
+
+  if (!user) {
+    return (
+      <main className="min-h-[100dvh] py-4 md:py-8 px-4">
+        <div className="max-w-lg mx-auto">
+          <header className="text-center mb-6">
+            <div className="text-3xl md:text-4xl mb-3">🔄</div>
+            <h1 className="text-xl md:text-2xl font-bold text-foreground-primary mb-2">
+              הפרספקטיבה השנייה
+            </h1>
+            <p className="text-foreground-secondary">
+              הבנת נקודת המבט של המין השני
+            </p>
+          </header>
+          <PhoneLogin />
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <main className="min-h-screen py-8 px-4">
+    <main className="min-h-[100dvh] py-4 md:py-8 px-4">
       <div className="max-w-lg mx-auto">
         {/* Header */}
         <header className="text-center mb-6">
-          <div className="text-4xl mb-3">🔄</div>
-          <h1 className="text-2xl font-bold text-foreground-primary mb-2">
+          <div className="text-3xl md:text-4xl mb-3">🔄</div>
+          <h1 className="text-xl md:text-2xl font-bold text-foreground-primary mb-2">
             הפרספקטיבה השנייה
           </h1>
           <p className="text-foreground-secondary">
@@ -250,7 +259,7 @@ export default function Home() {
         {/* Conversations List */}
         <div className="flex justify-center mb-6">
           <ConversationsList
-            deviceId={deviceId}
+            userId={userId}
             onSelect={handleLoadConversation}
             onNewConversation={handleReset}
             currentConversationId={conversationId}
@@ -297,9 +306,12 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="mt-8 text-center text-sm text-foreground-secondary">
-          <p>
-            מבוסס על מחקרים של דבורה טאנן וג׳ון גוטמן
-          </p>
+          <button
+            onClick={signOut}
+            className="text-foreground-secondary hover:text-foreground-primary transition-colors underline"
+          >
+            התנתקות
+          </button>
         </footer>
       </div>
     </main>

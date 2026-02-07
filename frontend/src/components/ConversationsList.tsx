@@ -14,7 +14,7 @@ interface ConversationSummary {
 }
 
 interface ConversationsListProps {
-  deviceId: string;
+  userId: string;
   onSelect: (conversationId: string) => void;
   onNewConversation: () => void;
   currentConversationId: string | null;
@@ -23,7 +23,7 @@ interface ConversationsListProps {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function ConversationsList({
-  deviceId,
+  userId,
   onSelect,
   onNewConversation,
   currentConversationId,
@@ -34,12 +34,12 @@ export default function ConversationsList({
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   const fetchConversations = async () => {
-    if (!deviceId) return;
+    if (!userId) return;
 
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${API_URL}/api/conversations?device_id=${deviceId}`
+        `${API_URL}/api/conversations?user_id=${userId}`
       );
       if (response.ok) {
         const data = await response.json();
@@ -53,10 +53,10 @@ export default function ConversationsList({
   };
 
   useEffect(() => {
-    if (isOpen && deviceId) {
+    if (isOpen && userId) {
       fetchConversations();
     }
-  }, [isOpen, deviceId]);
+  }, [isOpen, userId]);
 
   const handleDelete = async (e: React.MouseEvent, conversationId: string) => {
     e.stopPropagation();
@@ -138,8 +138,9 @@ export default function ConversationsList({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-80 max-h-96 overflow-y-auto
-                        bg-background-card rounded-xl shadow-lg border border-gray-200 z-50">
+        <div className="absolute top-full right-0 mt-2 w-80 max-w-[90vw] max-h-[60vh] md:max-h-96 overflow-y-auto
+                        bg-background-card rounded-xl shadow-lg border border-gray-200 z-50
+                        -webkit-overflow-scrolling-touch">
           {/* Header */}
           <div className="p-3 border-b border-gray-100">
             <div className="flex justify-between items-center mb-2">
@@ -149,7 +150,7 @@ export default function ConversationsList({
                   onNewConversation();
                   setIsOpen(false);
                 }}
-                className="text-sm px-3 py-1 rounded-lg bg-accent-primary text-white hover:brightness-110"
+                className="text-sm px-3 py-2 rounded-lg bg-accent-primary text-white hover:brightness-110 min-h-[40px]"
               >
                 + שיחה חדשה
               </button>
@@ -158,7 +159,7 @@ export default function ConversationsList({
             <div className="flex gap-2">
               <button
                 onClick={() => setShowFavoritesOnly(false)}
-                className={`text-xs px-2 py-1 rounded-md transition-colors ${
+                className={`text-sm px-3 py-2 rounded-md transition-colors min-h-[36px] ${
                   !showFavoritesOnly
                     ? "bg-accent-primary/20 text-accent-primary"
                     : "text-foreground-secondary hover:bg-background-secondary"
@@ -168,7 +169,7 @@ export default function ConversationsList({
               </button>
               <button
                 onClick={() => setShowFavoritesOnly(true)}
-                className={`text-xs px-2 py-1 rounded-md transition-colors ${
+                className={`text-sm px-3 py-2 rounded-md transition-colors min-h-[36px] ${
                   showFavoritesOnly
                     ? "bg-accent-primary/20 text-accent-primary"
                     : "text-foreground-secondary hover:bg-background-secondary"
@@ -221,7 +222,7 @@ export default function ConversationsList({
                     <div className="flex flex-col gap-1">
                       <button
                         onClick={(e) => handleToggleFavorite(e, conv.id)}
-                        className={`p-1 transition-colors ${
+                        className={`p-2 min-w-[40px] min-h-[40px] flex items-center justify-center transition-colors ${
                           conv.is_favorite
                             ? "text-yellow-500"
                             : "text-gray-300 hover:text-yellow-500"
@@ -232,7 +233,7 @@ export default function ConversationsList({
                       </button>
                       <button
                         onClick={(e) => handleDelete(e, conv.id)}
-                        className="text-error/60 hover:text-error p-1"
+                        className="text-error/60 hover:text-error p-2 min-w-[40px] min-h-[40px] flex items-center justify-center"
                         title="מחק"
                       >
                         🗑️

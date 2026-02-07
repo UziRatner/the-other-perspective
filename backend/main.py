@@ -74,7 +74,11 @@ class AnalyzeRequest(BaseModel):
     )
     device_id: str | None = Field(
         default=None,
-        description="Device ID for persistence",
+        description="Device ID for persistence (deprecated, use user_id)",
+    )
+    user_id: str | None = Field(
+        default=None,
+        description="Authenticated user ID",
     )
     conversation_id: str | None = Field(
         default=None,
@@ -137,15 +141,21 @@ async def health_check():
 
 
 @app.get("/api/conversations")
-async def get_conversations(device_id: str) -> list[ConversationSummary]:
-    """Get all conversations for a device."""
+async def get_conversations(device_id: str | None = None, user_id: str | None = None) -> list[ConversationSummary]:
+    """Get all conversations for a user."""
     if not supabase:
         raise HTTPException(status_code=500, detail="Database not configured")
+
+    # Prefer user_id, fall back to device_id
+    filter_field = "user_id" if user_id else "device_id"
+    filter_value = user_id or device_id
+    if not filter_value:
+        raise HTTPException(status_code=400, detail="user_id or device_id required")
 
     try:
         result = supabase.table("conversations") \
             .select("id, situation, user_gender, context, messages, is_favorite, created_at, updated_at") \
-            .eq("device_id", device_id) \
+            .eq(filter_field, filter_value) \
             .order("updated_at", desc=True) \
             .execute()
 
@@ -265,6 +275,7 @@ async def save_conversation(
     user_gender: str,
     context: str,
     messages: list[dict],
+    user_id: str | None = None,
 ) -> str:
     """Save or update a conversation. Returns conversation ID."""
     if not supabase:
@@ -283,14 +294,17 @@ async def save_conversation(
             return conversation_id
         else:
             # Create new conversation
-            result = supabase.table("conversations") \
-                .insert({
-                    "device_id": device_id,
+            row = {
+                    "device_id": device_id or user_id,
                     "situation": situation,
                     "user_gender": user_gender,
                     "context": context,
                     "messages": messages,
-                }) \
+            }
+            if user_id:
+                row["user_id"] = user_id
+            result = supabase.table("conversations") \
+                .insert(row) \
                 .execute()
 
             return result.data[0]["id"] if result.data else None
@@ -337,20 +351,22 @@ async def analyze_situation(request: AnalyzeRequest) -> AnalyzeResponse | Follow
 
             response_text = message.content[0].text
 
-            # Save conversation if device_id provided
+            # Save conversation if user identified
             conversation_id = request.conversation_id
-            if request.device_id:
+            identifier = request.user_id or request.device_id
+            if identifier:
                 # Add the new assistant response to messages for saving
                 all_messages = [{"role": m.role, "content": m.content} for m in request.messages]
                 all_messages.append({"role": "assistant", "content": response_text})
 
                 conversation_id = await save_conversation(
-                    device_id=request.device_id,
+                    device_id=request.device_id or request.user_id,
                     conversation_id=request.conversation_id,
                     situation=request.situation,
                     user_gender=request.user_gender,
                     context=request.context,
                     messages=all_messages,
+                    user_id=request.user_id,
                 )
 
             return FollowupResponse(response=response_text, conversation_id=conversation_id)
@@ -386,20 +402,22 @@ async def analyze_situation(request: AnalyzeRequest) -> AnalyzeResponse | Follow
                         detail="Failed to parse AI response",
                     )
 
-            # Save conversation if device_id provided
+            # Save conversation if user identified
             conversation_id = None
-            if request.device_id:
+            identifier = request.user_id or request.device_id
+            if identifier:
                 initial_messages = [
                     {"role": "user", "content": request.situation},
                     {"role": "assistant", "content": response_text},
                 ]
                 conversation_id = await save_conversation(
-                    device_id=request.device_id,
+                    device_id=request.device_id or request.user_id,
                     conversation_id=None,
                     situation=request.situation,
                     user_gender=request.user_gender,
                     context=request.context,
                     messages=initial_messages,
+                    user_id=request.user_id,
                 )
 
             return AnalyzeResponse(

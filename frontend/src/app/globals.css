@@ -27,11 +27,15 @@ body {
   max-width: 100vw;
   overflow-x: hidden;
   font-family: 'Heebo', 'Rubik', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 /* RTL Support */
@@ -39,22 +43,24 @@ body {
   text-align: right;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
+/* Custom scrollbar - only on devices with hover (not touch) */
+@media (hover: hover) {
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
 
-::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-}
+  ::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+  }
 
-::-webkit-scrollbar-thumb {
-  background: var(--accent-primary);
-  border-radius: 4px;
-}
+  ::-webkit-scrollbar-thumb {
+    background: var(--accent-primary);
+    border-radius: 4px;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #8a5a8a;
+  ::-webkit-scrollbar-thumb:hover {
+    background: #8a5a8a;
+  }
 }
 
 /* Animation classes */
@@ -82,6 +88,13 @@ body {
   animation: pulse 2s ease-in-out infinite;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-slide-up,
+  .animate-pulse-slow {
+    animation: none;
+  }
+}
+
 /* Button hover effects */
 .btn-primary {
   @apply bg-accent-primary text-white font-medium py-3 px-6 rounded-lg
@@ -91,13 +104,13 @@ body {
 
 /* Card styles */
 .card {
-  @apply bg-background-card rounded-xl shadow-sm border border-gray-100 p-6;
+  @apply bg-background-card rounded-xl shadow-sm border border-gray-100 p-4 md:p-6;
 }
 
 /* Toggle button styles */
 .toggle-btn {
-  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200
-         border-2 border-transparent;
+  @apply px-4 py-3 rounded-lg font-medium transition-all duration-200
+         border-2 border-transparent min-h-[44px];
 }
 
 .toggle-btn.active {

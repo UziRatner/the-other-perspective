@@ -26,12 +26,12 @@ export default function ConversationHistory({ messages }: ConversationHistoryPro
           style={{ animationDelay: `${index * 0.1}s` }}
         >
           {message.role === "user" ? (
-            <div className="max-w-[85%] p-3 rounded-lg bg-accent-primary/10 border border-accent-primary/30">
+            <div className="max-w-[90%] md:max-w-[85%] p-3 rounded-lg bg-accent-primary/10 border border-accent-primary/30">
               <p className="text-foreground-primary text-sm">{message.content}</p>
             </div>
           ) : (
             <div className="card p-4">
-              <p className="text-foreground-primary leading-relaxed whitespace-pre-wrap">
+              <p className="text-foreground-primary leading-relaxed whitespace-pre-wrap break-words">
                 {message.content}
               </p>
             </div>

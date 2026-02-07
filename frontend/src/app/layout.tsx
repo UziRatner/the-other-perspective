@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { AuthProvider } from "@/components/AuthProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -20,8 +21,9 @@ export const viewport: Viewport = {
   themeColor: "#9D6B9D",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -36,8 +38,10 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
-      <body className="min-h-screen bg-background-primary">
+      <body className="min-h-[100dvh] bg-background-primary">
+        <AuthProvider>
         {children}
+        </AuthProvider>
         <script
           dangerouslySetInnerHTML={{
             __html: `
